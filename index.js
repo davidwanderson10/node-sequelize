@@ -9,7 +9,7 @@ const iniciar = async () => {
         attributes: ['name', 'email'],
       });;
     // Exibir os usuários encontrados
-    console.log('Usuários encontrados:', usuarios);
+    console.log('Usuários:', usuarios.map(u => u.toJSON()))
 }
 
 iniciar()
