@@ -1,5 +1,6 @@
 const sequelize = require('../config/database');
 const Usuarios = require('./users');
+const Alunos = require('./Alunos');
 
 //conectar ao banco de dados
 const connectToDatabase = async () => {
@@ -7,8 +8,8 @@ const connectToDatabase = async () => {
         await sequelize.authenticate();
         console.log('🟢 Conexão estabelecida com sucesso.');
 
-        // await sequelize.sync({alter: true});
         // console.log('🔄 Modelos sincronizados com o banco de dados.');
+        await sequelize.sync({alter: true});
         
     } catch (error) {
         console.error('🔴 Erro ao conectar ao banco:', error);
@@ -16,4 +17,4 @@ const connectToDatabase = async () => {
 
 }
 
-module.exports = {connectToDatabase, Usuarios}
+module.exports = {connectToDatabase, Usuarios, Alunos};
