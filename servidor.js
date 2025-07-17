@@ -1,7 +1,7 @@
 // importando o módulo http do Node.js
 const http = require('http');
 // importando os modelos e a função de conexão com o banco de dados
-const { connectToDatabase, Usuarios } = require('./models');
+const { connectToDatabase, Usuarios, Professores } = require('./models');
 
 // criando um servidor HTTP
 const server = http.createServer(async (req, res) => {
@@ -96,7 +96,92 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////
+    ///////////////////////// ROTA GET /professores /////////////////////////
+    if (req.method === 'GET' && req.url === '/professores') {
+        console.log('🔵 Rota GET /professores acionada');
+        try {
+          const professores = await Professores.findAll({attributes: ['nome', 'email', 'sede', 'data_contratacao', 'ativo']});
+          const data = professores.map(p => p.toJSON());
+          return res.end(JSON.stringify(data));
+
+        } catch (error) {
+            console.error('🔴 Erro ao buscar professores:', error);
+            res.statusCode = 500;
+            res.end(JSON.stringify({ message: 'Erro ao buscar professores' }));
+        }
+    }
+
+     ///////////////////////// ROTA POST /professores /////////////////////////
+     else if (req.method === 'POST' && req.url === '/professores') {
+        console.log('🔵 Rota POST /professores acionada');
+        
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString(); // converte o Buffer para string
+        });
+
+        req.on('end', async () => {
+            try {
+                const professorData = JSON.parse(body); // converte a string JSON para objeto
+                const novoProfessor = await Professores.create(professorData); // cria um novo professor no banco de dados
+                res.statusCode = 201; // Created
+                return res.end(JSON.stringify(novoProfessor.toJSON()));
+            } catch (error) {
+                console.error('🔴 Erro ao criar professor:', error);
+                res.statusCode = 400; // Bad Request
+                return res.end(JSON.stringify({ message: 'Erro ao criar professor' }));
+            }
+        });
+    } 
+
+     ///////////////////////// ROTA UPDATE professores /////////////////////////
+     else if (req.method === 'PUT' && req.url.startsWith('/professores/')) { 
+        const id = req.url.split('/')[2] // id = [ "localhost:3000", "professores", "6"] extrai o ID do usuário da URL
+        console.log(`🟢 Rota PUT /professores/${id} acionada`);
+
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString(); // converte o Buffer para string
+        });
+
+        req.on('end', async () => {
+            try {
+                const professorData = JSON.parse(body); // converte a string JSON para objeto
+                const [updated] = await Professores.update(professorData, { where: { id } }); // atualiza o professor no banco de dados
+                if (updated) {
+                    const updatedProfessor = await Professores.findByPk(id);
+                    return res.end(JSON.stringify(updatedProfessor.toJSON()));
+                }
+                res.statusCode = 404; // Not Found
+                return res.end(JSON.stringify({ message: 'Professor não encontrado' }));
+            } catch (error) {
+                console.error('🔴 Erro ao atualizar professor:', error);
+                res.statusCode = 400; // Bad Request
+                return res.end(JSON.stringify({ message: 'Erro ao atualizar professor' }));
+            }
+        });
+    }
+
+    ///////////////////////// ROTA DELETE professores /////////////////////////
+    else if (req.method === 'DELETE' && req.url.startsWith('/professores/')) {
+        const id = req.url.split('/')[2] // id = [ "localhost:3000", "professores", "6"] extrai o ID do professor da URL
+        console.log(`🟢 Rota DELETE /professores/${id} acionada`);
+
+        try {
+            const deleted = await Professores.destroy({ where: { id } }); // deleta o professor do banco de dados pelo id indicado
+            if (deleted) {
+                res.statusCode = 204; // No Content
+                return res.end();
+            }
+            res.statusCode = 404; // Not Found
+            return res.end(JSON.stringify({ message: 'Professor não encontrado' }));
+        } catch (error) {
+            console.error('🔴 Erro ao deletar professor:', error);
+            res.statusCode = 500; // Internal Server Error
+            return res.end(JSON.stringify({ message: 'Erro ao deletar professor' }));
+        }
+    }
+
     
 })
 
