@@ -49,8 +49,8 @@ const server = http.createServer(async (req, res) => {
     } 
 
     ///////////////////////// ROTA UPDATE /////////////////////////
-    else if (req.method === 'PUT' && req.url.startsWith('/usuarios/')) {
-        const id = req.url.split('/')[2]; // extrai o ID do usuário da URL
+    else if (req.method === 'PUT' && req.url.startsWith('/usuarios/')) { 
+        const id = req.url.split('/')[2] // id = [ "localhost:3000", "usuarios", "6"] extrai o ID do usuário da URL
         console.log(`🟢 Rota PUT /usuarios/${id} acionada`);
 
         let body = '';
@@ -75,6 +75,26 @@ const server = http.createServer(async (req, res) => {
             }
         });
     }
+
+    ///////////////////////// ROTA DELETE /////////////////////////
+    else if (req.method === 'DELETE' && req.url.startsWith('/usuarios/')) {
+        const id = req.url.split('/')[2] // id = [ "localhost:3000", "usuarios", "6"] extrai o ID do usuário da URL
+        console.log(`🟢 Rota DELETE /usuarios/${id} acionada`);
+
+        try {
+            const deleted = await Usuarios.destroy({ where: { id } }); // deleta o usuário do banco de dados pelo id indicado
+            if (deleted) {
+                res.statusCode = 204; // No Content
+                return res.end();
+            }
+            res.statusCode = 404; // Not Found
+            return res.end(JSON.stringify({ message: 'Usuário não encontrado' }));
+        } catch (error) {
+            console.error('🔴 Erro ao deletar usuário:', error);
+            res.statusCode = 500; // Internal Server Error
+            return res.end(JSON.stringify({ message: 'Erro ao deletar usuário' }));
+        }
+    }
     
 })
 
@@ -84,13 +104,14 @@ server.listen(port, () => {
 });
 
 
+// RESUMO SOBRE OS MÉTODOS HTTP:
+// GET: Usado para buscar dados do servidor. Exemplo: buscar todos os usuários ou um usuário específico, geralmente não altera o estado do servidor e não deve ter efeitos colaterais. Não deve ter corpo na requisição.
 
+// POST: Usado para enviar dados ao servidor, geralmente para criar um novo recurso. Exemplo: criar um novo usuário ou um simples login. Pode ter um corpo na requisição com os dados a serem enviados.
 
+// PUT: Usado para atualizar um recurso existente no servidor. Exemplo: atualizar os dados de um usuário específico. Geralmente, o corpo da requisição contém os dados atualizados e a URL contém o identificador do recurso a ser atualizado.
 
-
-
-
-
+// DELETE: Usado para remover um recurso do servidor. Exemplo: deletar um usuário específico. A URL geralmente contém o identificador do recurso a ser removido, e não deve ter corpo na requisição. A URL pode ser algo como `/usuarios/6`, onde `6` é o ID do usuário a ser deletado igual ao PUT.
 
 
 // Buscar todos os usuários com atributos específicos
