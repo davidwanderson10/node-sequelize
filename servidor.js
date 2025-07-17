@@ -95,6 +95,8 @@ const server = http.createServer(async (req, res) => {
             return res.end(JSON.stringify({ message: 'Erro ao deletar usuário' }));
         }
     }
+
+    /////////////////////////////////////////////////////////////////////////
     
 })
 
@@ -131,3 +133,21 @@ server.listen(port, () => {
 //   res.statusCode = 404;
 //   res.end(JSON.stringify({ message: 'Rota não encontrada' }));
 // }
+
+
+// CRIE UM CRUD (Create, Read, Update, Delete) simples para gerenciar professores em um sistema escolar.
+// O CRUD deve permitir:
+// 1. Criar um novo professor (POST /professores)
+// 2. Listar todos os professores (GET /professores)
+// 3. Atualizar os dados de um professor (PUT /professores/:id
+// 4. Deletar um professor (DELETE /professores/:id)
+
+// Campos do modelo:
+// - id (número, auto-incremento)
+// - nome (string, obrigatório)
+// - email (string, obrigatório, único)
+// - sede (string, obrigatório)
+// - dataContratacao (data, obrigatório)
+// - ativo (booleano, padrão true)
+// - createdAt (data de criação, gerado automaticamente)
+// - updatedAt (data de atualização, gerado automaticamente)
